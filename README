@@ -1,0 +1,9 @@
+Allows you to create a backup of a sql database based on the current Git Branch.
+
+    Backup-GitBranchDb -BackupPath "[PATH_TO_FOLDER]\" -DbName "DBNAME"
+	Restore-GitBranchDb -BackupPath "[PATH_TO_FOLDER]\" -DbName "DBNAME"
+	Save-GitBranchDbSettings -BackupPath "[PATH_TO_FOLDER]\" -DbName "DBNAME"
+
+`Save-GitBranchDbSettings` will create `git_db_settings.xml` in the folder and save BackupPath and DbName. After saving the settings you can simply call Backup & Restore
+
+Currently does not support named instances.
