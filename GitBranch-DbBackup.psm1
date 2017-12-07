@@ -41,7 +41,7 @@ function Backup-GitBranchDb($BackupPath, $DbName) {
     #Write-Host $toRun
 }
 
-function Retore-GitBranchDb($BackupPath, $DbName) {
+function Restore-GitBranchDb($BackupPath, $DbName) {
     $script:BackupPath = $BackupPath
     $script:DbName = $DbName
     if (-Not (CheckParms)) {
@@ -53,10 +53,11 @@ function Retore-GitBranchDb($BackupPath, $DbName) {
         $ErrorMessage = "Must provide a -DbName and -BackupPath or create a settings file as git_db_settings.xml"
         throw [System.ArgumentException] $ErrorMessage
     }
-    Write-Host "Doing backup"
+    Write-Host "Doing restore"
     $gitBranch = git branch | grep \* | cut -d ' ' -f2-
-    $toRun = 'SqlCmd -E -Q "RESTORE DATABASE [' + $script:DbName + '] FROM DISK='''+ $script:BackupPath + $gitBranch + '.bak''"'
-    iex $toRun
+    iex 'SqlCmd -E -Q "ALTER DATABASE [$script:DbName] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"'
+    iex 'SqlCmd -E -Q "RESTORE DATABASE [$script:DbName] FROM DISK=''$script:BackupPath$gitBranch.bak'' WITH REPLACE"'
+    iex 'SqlCmd -E -Q "ALTER DATABASE [$script:DbName] SET MULTI_USER"';
     #Write-Host $toRun
 }
 
@@ -78,5 +79,5 @@ function Save-GitBranchDbSettings($DbName, $BackupPath) {
 }
 
 Export-ModuleMember Backup-GitBranchDb
-Export-ModuleMember Retore-GitBranchDb
+Export-ModuleMember Restore-GitBranchDb
 Export-ModuleMember Save-GitBranchDbSettings
